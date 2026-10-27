@@ -1,40 +1,25 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"name": "Zelkel",
+	"scopeName": "source.zelkel",
 	"patterns": [
-		{
-			"include": "#comments"
-		},
-		{
-			"include": "#llvmBlock"
-		},
-		{
-			"include": "#keywords"
-		},
-		{
-			"include": "#declarations"
-		},
-		{
-			"include": "#attributes"
-		},
-		{
-			"include": "#typeNames"
-		},
-		{
-			"include": "#functionNames"
-		},
-		{
-			"include": "#numbers"
-		},
-		{
-			"include": "#operators"
-		},
-		{
-			"include": "#punctuation"
-		},
-		{
-			"include": "#strings"
-		}
+		{ "include": "#comments" },
+		{ "include": "#llvmBlock" },
+		{ "include": "#llvmParen" },
+		{ "include": "#strings" },
+		{ "include": "#enumDecl" },
+		{ "include": "#declarations" },
+		{ "include": "#attributes" },
+		{ "include": "#keywords" },
+		{ "include": "#primitiveTypes" },
+		{ "include": "#enumMembers" },
+		{ "include": "#namespaces" },
+		{ "include": "#parameters" },
+		{ "include": "#functionCalls" },
+		{ "include": "#typeNames" },
+		{ "include": "#numbers" },
+		{ "include": "#operators" },
+		{ "include": "#punctuation" }
 	],
 	"repository": {
 		"comments": {
@@ -50,121 +35,340 @@
 				}
 			]
 		},
+
 		"llvmBlock": {
 			"begin": "(#llvm)\\s*(\\{)",
 			"beginCaptures": {
-				"1": {
-					"name": "keyword.control.directive.llvm.zelkel"
-				},
-				"2": {
-					"name": "punctuation.section.block.begin.zelkel"
-				}
+				"1": { "name": "keyword.control.directive.llvm.zelkel" },
+				"2": { "name": "punctuation.section.block.begin.zelkel" }
 			},
 			"end": "(\\})",
 			"endCaptures": {
-				"1": {
-					"name": "punctuation.section.block.end.zelkel"
-				}
+				"1": { "name": "punctuation.section.block.end.zelkel" }
 			},
 			"contentName": "meta.embedded.block.llvm.zelkel",
 			"patterns": [
+				{ "include": "#comments" },
+				{ "include": "#llvmRawString" },
+				{ "include": "#llvmString" },
+				{ "include": "#llvmContent" }
+			]
+		},
+
+		"llvmParen": {
+			"begin": "(#llvm)\\s*(\\()",
+			"beginCaptures": {
+				"1": { "name": "keyword.control.directive.llvm.zelkel" },
+				"2": { "name": "punctuation.section.group.begin.zelkel" }
+			},
+			"end": "(\\))",
+			"endCaptures": {
+				"1": { "name": "punctuation.section.group.end.zelkel" }
+			},
+			"contentName": "meta.embedded.block.llvm.zelkel",
+			"patterns": [
+				{ "include": "#comments" },
+				{ "include": "#llvmRawString" },
+				{ "include": "#llvmString" },
+				{ "include": "#llvmContent" }
+			]
+		},
+
+		"llvmRawString": {
+			"name": "string.quoted.other.raw.llvm.zelkel",
+			"begin": "#\"",
+			"end": "\"#",
+			"patterns": [
+				{ "include": "#llvmEscapes" },
+				{ "include": "#llvmContent" }
+			]
+		},
+
+		"llvmString": {
+			"name": "string.quoted.double.llvm.zelkel",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{ "include": "#llvmEscapes" },
+				{ "include": "#llvmContent" }
+			]
+		},
+
+		"llvmEscapes": {
+			"patterns": [
 				{
-					"name": "keyword.control.llvm.instruction.zelkel",
-					"match": "\\b(alloca|store|load|call|ret|br|phi|getelementptr|bitcast|ptrtoint|inttoptr|malloc|free|align)\\b"
+					"name": "constant.character.escape.llvm.zelkel",
+					"match": "\\\\[0-9A-Fa-f]{2}"
 				},
 				{
-					"name": "support.type.llvm.integer.zelkel",
-					"match": "\\bi[0-9]+\\b"
+					"name": "constant.character.escape.zelkel",
+					"match": "\\\\."
+				}
+			]
+		},
+
+		"llvmContent": {
+			"patterns": [
+				{
+					"name": "keyword.control.llvm.instruction.zelkel",
+					"match": "\\b(alloca|store|load|call|ret|br|phi|getelementptr|bitcast|ptrtoint|inttoptr|malloc|free|align|declare|define|constant|global|private|unnamed_addr|add|sub|mul|icmp|fadd|fsub|fmul|fdiv)\\b"
+				},
+				{
+					"name": "support.type.llvm.zelkel",
+					"match": "\\b(i[0-9]+|ptr|double|float|void)\\b"
+				},
+				{
+					"name": "variable.other.global.llvm.zelkel",
+					"match": "@[A-Za-z_.$][A-Za-z0-9_.$]*"
 				},
 				{
 					"name": "variable.other.register.llvm.zelkel",
-					"match": "%[A-Za-z_][A-Za-z0-9_]*"
+					"match": "%[A-Za-z_.$][A-Za-z0-9_.$]*"
+				},
+				{ "include": "#numbers" }
+			]
+		},
+
+		"strings": {
+			"patterns": [
+				{
+					"name": "string.quoted.other.raw.zelkel",
+					"begin": "#\"",
+					"end": "\"#"
 				},
 				{
-					"include": "#numbers"
+					"name": "string.quoted.double.format.zelkel",
+					"begin": "\\bf\"",
+					"end": "\"",
+					"patterns": [
+						{
+							"name": "constant.character.escape.zelkel",
+							"match": "\\\\."
+						},
+						{
+							"name": "meta.interpolation.zelkel",
+							"begin": "\\{",
+							"beginCaptures": {
+								"0": { "name": "punctuation.section.interpolation.begin.zelkel" }
+							},
+							"end": "\\}",
+							"endCaptures": {
+								"0": { "name": "punctuation.section.interpolation.end.zelkel" }
+							},
+							"patterns": [{ "include": "$self" }]
+						}
+					]
 				},
 				{
-					"include": "#strings"
+					"name": "string.quoted.double.zelkel",
+					"begin": "\"",
+					"end": "\"",
+					"patterns": [
+						{
+							"name": "constant.character.escape.zelkel",
+							"match": "\\\\."
+						}
+					]
 				}
 			]
 		},
-		"keywords": {
-			"patterns": [{
-				"name": "keyword.control.zelkel",
-				"match": "\\b(package|require|self|val|var|const|if|else|while|for|return)\\b|\\b(?:class!?|struct!?|fn!?)(?![A-Za-z0-9_])"
-			}, {
-				"name": "constant.language.zelkel",
-				"match": "\\b(true|false|null)\\b"
-			}, {
-				"name": "support.type.primitive.zelkel",
-				"match": "\\b(void|Self|String)\\b"
-			}]
+
+		"enumDecl": {
+			"begin": "\\b(enum)\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*(\\{)",
+			"beginCaptures": {
+				"1": { "name": "keyword.declaration.enum.zelkel" },
+				"2": { "name": "entity.name.type.enum.zelkel" },
+				"3": { "name": "punctuation.section.block.begin.zelkel" }
+			},
+			"end": "(\\})",
+			"endCaptures": {
+				"1": { "name": "punctuation.section.block.end.zelkel" }
+			},
+			"patterns": [
+				{ "include": "#comments" },
+				{
+					"name": "variable.other.enummember.zelkel",
+					"match": "[A-Za-z_][A-Za-z0-9_]*"
+				},
+				{
+					"name": "punctuation.separator.comma.zelkel",
+					"match": ","
+				}
+			]
 		},
+
+		"namespacePath": {
+			"patterns": [
+				{
+					"name": "keyword.operator.access.zelkel",
+					"match": "::"
+				},
+				{
+					"name": "entity.name.namespace.zelkel",
+					"match": "[A-Za-z_][A-Za-z0-9_]*"
+				}
+			]
+		},
+
 		"declarations": {
 			"patterns": [
 				{
-					"name": "entity.name.namespace.zelkel",
-					"match": "(?<=\\bpackage\\s)[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*"
+					"match": "\\b(package)\\s+([A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*)",
+					"captures": {
+						"1": { "name": "keyword.control.package.zelkel" },
+						"2": { "patterns": [{ "include": "#namespacePath" }] }
+					}
 				},
 				{
-					"name": "entity.name.namespace.import.zelkel",
-					"match": "(?<=\\brequire\\s)[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*"
+					"match": "\\b(require)\\s*(\\{)([^}]*)(\\})\\s*(from)\\s+([A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*)",
+					"captures": {
+						"1": { "name": "keyword.control.import.zelkel" },
+						"2": { "name": "punctuation.definition.group.zelkel" },
+						"3": {
+							"patterns": [
+								{
+									"name": "punctuation.separator.comma.zelkel",
+									"match": ","
+								},
+								{
+									"name": "entity.name.type.import.zelkel",
+									"match": "[A-Za-z_][A-Za-z0-9_]*"
+								}
+							]
+						},
+						"4": { "name": "punctuation.definition.group.zelkel" },
+						"5": { "name": "keyword.control.import.zelkel" },
+						"6": { "patterns": [{ "include": "#namespacePath" }] }
+					}
 				},
 				{
-					"name": "entity.name.type.class.zelkel",
-					"match": "(?<=\\bclass!?\\s)[A-Za-z_][A-Za-z0-9_]*"
+					"match": "\\b(class|struct)(!?)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+					"captures": {
+						"1": { "name": "keyword.declaration.type.zelkel" },
+						"2": { "name": "storage.modifier.public.zelkel" },
+						"3": { "name": "entity.name.type.class.zelkel" }
+					}
 				},
 				{
-					"name": "entity.name.type.struct.zelkel",
-					"match": "(?<=\\bstruct!?\\s)[A-Za-z_][A-Za-z0-9_]*"
+					"match": "\\b(fn)(!?)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+					"captures": {
+						"1": { "name": "keyword.declaration.function.zelkel" },
+						"2": { "name": "storage.modifier.public.zelkel" },
+						"3": { "name": "entity.name.function.zelkel" }
+					}
+				},
+				{
+					"match": "\\b(val|var|const)\\s+([A-Za-z_][A-Za-z0-9_]*)",
+					"captures": {
+						"1": { "name": "storage.type.variable.zelkel" },
+						"2": { "name": "variable.other.definition.zelkel" }
+					}
 				}
 			]
 		},
+
 		"attributes": {
 			"patterns": [
 				{
 					"name": "storage.modifier.attribute.zelkel",
-					"match": ":[A-Za-z_][A-Za-z0-9_]*"
+					"match": "(?<=\\)\\s|\\))\\s*:[A-Za-z_][A-Za-z0-9_]*"
 				}
 			]
 		},
+
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.zelkel",
+					"match": "\\b(if|else|match|while|for|in|return|break|continue)\\b"
+				},
+				{
+					"name": "variable.language.self.zelkel",
+					"match": "\\bself\\b"
+				},
+				{
+					"name": "constant.language.zelkel",
+					"match": "\\b(true|false|null)\\b"
+				},
+				{
+					"name": "constant.language.wildcard.zelkel",
+					"match": "\\b_\\b"
+				}
+			]
+		},
+
+		"primitiveTypes": {
+			"name": "support.type.primitive.zelkel",
+			"match": "\\b(?:[iu](?:8|16|32|64|128|size)|f(?:32|64)|bool|char|void|Self|String)\\b"
+		},
+
+		"enumMembers": {
+			"name": "variable.other.enummember.zelkel",
+			"match": "(?<=::)[A-Z][A-Za-z0-9_]*\\b(?!\\s*[<(])"
+		},
+
+		"namespaces": {
+			"name": "entity.name.namespace.zelkel",
+			"match": "\\b[a-z_][A-Za-z0-9_]*(?=\\s*::)"
+		},
+
+		"parameters": {
+			"name": "variable.parameter.zelkel",
+			"match": "\\b[A-Za-z_][A-Za-z0-9_]*(?=\\s*:(?!:))"
+		},
+
+		"functionCalls": {
+			"name": "entity.name.function.call.zelkel",
+			"match": "\\b[a-z_][A-Za-z0-9_]*(?=\\s*(?:<[^<>()]*>)?\\s*\\()"
+		},
+
 		"typeNames": {
-			"patterns": [
-				{
-					"name": "storage.type.zelkel",
-					"match": "\\b[A-Z][A-Za-z0-9_]*\\b"
-				},
-				{
-					"name": "storage.type.generic.parameter.zelkel",
-					"match": "(?<=<)\\s*[A-Z][A-Za-z0-9_]*\\s*(?=>|,)"
-				}
-			]
+			"name": "entity.name.type.zelkel",
+			"match": "\\b[A-Z][A-Za-z0-9_]*\\b"
 		},
-		"functionNames": {
-			"patterns": [
-				{
-					"name": "entity.name.function.zelkel",
-					"match": "(?<=\\bfn!?\\s)[A-Za-z_][A-Za-z0-9_]*"
-				},
-				{
-					"name": "entity.name.function.call.zelkel",
-					"match": "\\b[A-Za-z_][A-Za-z0-9_]*(?=\\s*\\()"
-				}
-			]
-		},
+
 		"numbers": {
 			"patterns": [
 				{
+					"name": "constant.numeric.hex.zelkel",
+					"match": "\\b0[xX][0-9A-Fa-f_]+\\b"
+				},
+				{
+					"name": "constant.numeric.float.zelkel",
+					"match": "\\b\\d[\\d_]*\\.\\d[\\d_]*(?:[eE][+-]?\\d+)?\\b"
+				},
+				{
 					"name": "constant.numeric.integer.zelkel",
-					"match": "\\b\\d+\\b"
+					"match": "\\b\\d[\\d_]*\\b"
 				}
 			]
 		},
+
 		"operators": {
 			"patterns": [
 				{
 					"name": "keyword.operator.arrow.zelkel",
 					"match": "->"
+				},
+				{
+					"name": "keyword.operator.fat-arrow.zelkel",
+					"match": "=>"
+				},
+				{
+					"name": "keyword.operator.variadic.zelkel",
+					"match": "\\.\\.\\."
+				},
+				{
+					"name": "keyword.operator.comparison.zelkel",
+					"match": "==|!=|<=|>="
+				},
+				{
+					"name": "keyword.operator.logical.zelkel",
+					"match": "&&|\\|\\||!"
+				},
+				{
+					"name": "keyword.operator.access.zelkel",
+					"match": "::|\\."
 				},
 				{
 					"name": "keyword.operator.reference.zelkel",
@@ -175,15 +379,12 @@
 					"match": "="
 				},
 				{
-					"name": "keyword.operator.access.zelkel",
-					"match": "(::|\\.)"
-				},
-				{
-					"name": "keyword.operator.zelkel",
-					"match": "[+\\-*/%!]"
+					"name": "keyword.operator.arithmetic.zelkel",
+					"match": "[+\\-*/%]"
 				}
 			]
 		},
+
 		"punctuation": {
 			"patterns": [
 				{
@@ -196,21 +397,9 @@
 				},
 				{
 					"name": "punctuation.definition.group.zelkel",
-					"match": "[(){}<>]"
-				}
-			]
-		},
-		"strings": {
-			"name": "string.quoted.double.zelkel",
-			"begin": "\"",
-			"end": "\"",
-			"patterns": [
-				{
-					"name": "constant.character.escape.zelkel",
-					"match": "\\\\."
+					"match": "[(){}\\[\\]<>]"
 				}
 			]
 		}
-	},
-	"scopeName": "source.zelkel"
+	}
 }

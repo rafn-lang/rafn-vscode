@@ -2,7 +2,7 @@
   "name": "zelkel",
   "displayName": "Zelkel",
   "description": "Zelkel language support",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "icon": "./icons/kel-bg.png",
   "publisher": "JohanRong",
   "repository": {
