@@ -5,14 +5,19 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       id-token: write
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm ci
-      - run: npx @vscode/vsce@latest publish --oidc
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Publish to Marketplace
+        run: npx @vscode/vsce@latest publish --oidc
