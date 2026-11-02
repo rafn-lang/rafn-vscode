@@ -1,3 +1,3 @@
-# Zelkel
+# Rafn
 
-VSCode language support for [Zelkel](https://github.com/johron/zelkel) (the language and this language support is in development)
+VSCode language support for [Rafn](https://github.com/rafnlang/rafn) (the language and this language support is in development)
