@@ -4,7 +4,7 @@
   "description": "Rafn language support",
   "version": "0.1.0",
   "icon": "./icons/rafn.jpg",
-  "publisher": "JohanRong",
+  "publisher": "rafn-lang",
   "repository": {
     "type": "git",
     "url": "https://github.com/rafnlang/rafn-vscode"
