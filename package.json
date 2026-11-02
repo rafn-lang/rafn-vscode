@@ -2,7 +2,7 @@
   "name": "rafn",
   "displayName": "Rafn",
   "description": "Rafn language support",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "icon": "./icons/rafn.jpg",
   "publisher": "rafn-lang",
   "repository": {
