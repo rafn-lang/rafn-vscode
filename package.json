@@ -2,8 +2,8 @@
   "name": "rafn",
   "displayName": "Rafn",
   "description": "Rafn language support",
-  "version": "0.1.1",
-  "icon": "./icons/rafn.jpg",
+  "version": "0.1.2",
+  "icon": "./icons/rafn.png",
   "publisher": "rafn-lang",
   "repository": {
     "type": "git",
@@ -22,8 +22,8 @@
       "extensions": [".rafn"],
       "configuration": "./language-configuration.json",
       "icon": {
-        "light": "./icons/rafn.jpg",
-        "dark": "./icons/rafn.jpg"
+        "light": "./icons/rafn-light.png",
+        "dark": "./icons/rafn-dark.png"
       }
     }],
     "grammars": [{
